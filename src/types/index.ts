@@ -5,6 +5,7 @@ import {z} from 'zod'
 const authSchema = z.object({
     name: z.string(),
     email: z.string().email(),
+    current_password: z.string(),
     password: z.string(),
     password_confirmation: z.string(),
     token: z.string()
@@ -17,8 +18,10 @@ export type UserRegistrationForm = Pick<Auth, 'name' | 'email' | 'password' | 'p
 export type RequestConfirmationCodeForm = Pick<Auth,  'email'>
 export type ForgotPasswordForm = Pick<Auth,  'email'>
 export type NewPasswordForm = Pick<Auth,  'password' | 'password_confirmation'>
+export type UpdateCurrentUserPasswordForm = Pick<Auth, 'current_password' |  'password' | 'password_confirmation'>
 
 export type ConfirmToken = Pick<Auth, 'token'>
+export type CheckPasswordForm = Pick<Auth, 'password'>
 
 /*Users */
 export const userSchema = authSchema.pick({
@@ -29,6 +32,7 @@ export const userSchema = authSchema.pick({
 })
 
 export type User = z.infer<typeof userSchema>
+export type UserProfileForm = Pick<User, 'name' | 'email'>
 
 /*Notes */
 
@@ -70,8 +74,17 @@ export const taskShema = z.object({
     updatedAt: z.string()
 })
 
+export const taskProjectSchema = taskShema.pick({
+    _id: true,
+    name: true,
+    description: true,
+    status: true
+})
+
 export type Task = z.infer<typeof taskShema>
 export type TaskFormData = Pick<Task, 'name' | 'description'>
+
+export type TaskProject = z.infer<typeof taskProjectSchema>
 
 
 /* Projects */
@@ -80,9 +93,9 @@ export const projectShema = z.object({
     projectName: z.string(),
     clientName: z.string(),
     description: z.string(),
-    manager: z.string(userSchema.pick({_id: true}))
-    
-
+    manager: z.string(userSchema.pick({_id: true})),
+    tasks: z.array(taskProjectSchema),
+    team: z.array(z.string(userSchema.pick({_id: true})))
 })
 
 export const dashboardProjectSchema = z.array(
@@ -92,10 +105,13 @@ export const dashboardProjectSchema = z.array(
         clientName: true,
         description: true,
         manager: true
-
     })
 )
-
+export const editProjectSchema = projectShema.pick({
+    projectName: true,
+    clientName: true,
+    description: true,
+})
 export type Project = z.infer<typeof projectShema>
 export type ProjectFormData = Pick<Project, 'clientName' | 'projectName' | 'description'>
 

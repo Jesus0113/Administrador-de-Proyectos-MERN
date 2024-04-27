@@ -16,7 +16,6 @@ export default function RegisterView() {
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors },
   } = useForm({ defaultValues: initialValues });
 
@@ -30,7 +29,7 @@ export default function RegisterView() {
     }
   })
 
-  const handleRequestCode = (formData: RequestConfirmationCodeForm) => {};
+  const handleRequestCode = (formData: RequestConfirmationCodeForm) => mutate(formData);
 
   return (
     <>
